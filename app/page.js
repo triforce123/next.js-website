@@ -43,9 +43,9 @@ export default function PersonalWebsite() {
       <header className="mb-12">
         <h1 className="text-4xl font-bold text-gray-800 mb-4 mt-8">My Calculator AI</h1>
         <p className="text-xl text-gray-600 leading-relaxed">
-          Hi there! I'm an operations analyst with a knack for numbers and a keen interest in politics. 
+          Hi there! I&apos;m an operations analyst with a knack for numbers and a keen interest in politics. 
           I love creating calculators that simplify complex financial concepts, making them accessible to everyone. 
-          When I'm not crunching numbers, I enjoy following political cartoons to stay informed about current events 
+          When I&apos;m not crunching numbers, I enjoy following political cartoons to stay informed about current events 
           and to appreciate the power of visual commentary. This website showcases my work and interests - I hope you 
           find it useful and engaging!
         </p>
