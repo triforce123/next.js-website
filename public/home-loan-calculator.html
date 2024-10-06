@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Home Loan Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        details summary::-webkit-details-marker {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">Enhanced Home Loan Calculator</h1>
+            <p class="text-xl text-gray-600">Calculate your mortgage payments with detailed annual tax and cost projections, including extra payment simulations.</p>
+        </header>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Mortgage Input Section -->
+            <section class="lg:w-1/2">
+                <h2 class="text-3xl font-semibold text-gray-800 mb-6">Mortgage Details</h2>
+                <form id="mortgage-calculator" class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-2" for="home-price">Home Price ($):</label>
+                        <input type="number" id="home-price" class="w-full p-3 border border-gray-300 rounded-md" value="200000" placeholder="e.g., 350000" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-2" for="down-payment">Down Payment (%):</label>
+                        <input type="number" id="down-payment" class="w-full p-3 border border-gray-300 rounded-md" value="20" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-2" for="loan-term">Loan Term (years):</label>
+                        <input type="number" id="loan-term" class="w-full p-3 border border-gray-300 rounded-md" value="30" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-2" for="interest-rate">Interest Rate (%):</label>
+                        <input type="number" id="interest-rate" class="w-full p-3 border border-gray-300 rounded-md" value="5" placeholder="e.g., 3.5" step="0.01" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-2" for="start-date">Start Date:</label>
+                        <input type="date" id="start-date" class="w-full p-3 border border-gray-300 rounded-md" required>
+                    </div>
+
+                    <details class="mt-8">
+                        <summary class="text-2xl font-semibold text-gray-800 cursor-pointer">
+                            Annual Tax & Cost (Optional)
+                        </summary>
+                        <div class="mt-4 space-y-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="property-tax-check" class="mr-2">
+                                <label for="property-tax-check" class="text-gray-700 font-bold">Property Taxes</label>
+                            </div>
+                            <div id="property-tax-input" class="hidden">
+                                <label class="block text-gray-700 font-bold mb-2" for="property-tax">Property Taxes (%):</label>
+                                <input type="number" id="property-tax" class="w-full p-3 border border-gray-300 rounded-md" placeholder="e.g., 1.2" step="0.01">
+                            </div>
+
+                            <div class="flex items-center">
+                                <input type="checkbox" id="home-insurance-check" class="mr-2">
+                                <label for="home-insurance-check" class="text-gray-700 font-bold">Home Insurance</label>
+                            </div>
+                            <div id="home-insurance-input" class="hidden">
+                                <label class="block text-gray-700 font-bold mb-2" for="home-insurance">Home Insurance ($):</label>
+                                <input type="number" id="home-insurance" class="w-full p-3 border border-gray-300 rounded-md" placeholder="e.g., 1200">
+                            </div>
+
+                            <div class="flex items-center">
+                                <input type="checkbox" id="pmi-insurance-check" class="mr-2">
+                                <label for="pmi-insurance-check" class="text-gray-700 font-bold">PMI Insurance</label>
+                            </div>
+                            <div id="pmi-insurance-input" class="hidden">
+                                <label class="block text-gray-700 font-bold mb-2" for="pmi-insurance">PMI Insurance ($):</label>
+                                <input type="number" id="pmi-insurance" class="w-full p-3 border border-gray-300 rounded-md" placeholder="e.g., 1800">
+                            </div>
+
+                            <div class="flex items-center">
+                                <input type="checkbox" id="hoa-fee-check" class="mr-2">
+                                <label for="hoa-fee-check" class="text-gray-700 font-bold">HOA Fee</label>
+                            </div>
+                            <div id="hoa-fee-input" class="hidden">
+                                <label class="block text-gray-700 font-bold mb-2" for="hoa-fee">HOA Fee ($):</label>
+                                <input type="number" id="hoa-fee" class="w-full p-3 border border-gray-300 rounded-md" placeholder="e.g., 300">
+                            </div>
+
+                            <div class="flex items-center">
+                                <input type="checkbox" id="other-costs-check" class="mr-2">
+                                <label for="other-costs-check" class="text-gray-700 font-bold">Other Costs</label>
+                            </div>
+                            <div id="other-costs-input" class="hidden">
+                                <label class="block text-gray-700 font-bold mb-2" for="other-costs">Other Costs ($):</label>
+                                <input type="number" id="other-costs" class="w-full p-3 border border-gray-300 rounded-md" placeholder="e.g., 500">
+                            </div>
+                        </div>
+                    </details>
+
+                    <details class="mt-8">
+                        <summary class="text-2xl font-semibold text-gray-800 cursor-pointer">
+                            Annual Increase Rates (Optional)
+                        </summary>
+                        <div class="mt-4 space-y-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="property-tax-increase-check" class="mr-2">
+                                <label for="property-tax-increase-check" class="text-gray-700 font-bold">Property Taxes Increase</label>
+                            </div>
+                            <div id="property-tax-increase-input" class="hidden">
+                                <label class="block text-gray-700 font-bold mb-2" for="property-tax-increase">Property Taxes Increase (%):</label>
+                                <input type="number" id="property-tax-increase" class="w-full p-3 border border-gray-300 rounded-md" placeholder="e.g., 2" step="0.01">
+                            </div>
+
+                            <div class="flex items-center">
+                                <input type="checkbox" id="home-insurance-increase-check" class="mr-2">
+                                <label for="home-insurance-increase-check" class="text-gray-700 font-bold">Home Insurance Increase</label>
+                            </div>
+                            <div id="home-insurance-increase-input" class="hidden">
+                                <label class="block text-gray-700 font-bold mb-2" for="home-insurance-increase">Home Insurance Increase (%):</label>
+                                <input type="number" id="home-insurance-increase" class="w-full p-3 border border-gray-300 rounded-md" placeholder="e.g., 3" step="0.01">
+                            </div>
+
+                            <div class="flex items-center">
+                                <input type="checkbox" id="hoa-fee-increase-check" class="mr-2">
+                                <label for="hoa-fee-increase-check" class="text-gray-700 font-bold">HOA Fee Increase</label>
+                            </div>
+                            <div id="hoa-fee-increase-input" class="hidden">
+                                <label class="block text-gray-700 font-bold mb-2" for="hoa-fee-increase">HOA Fee Increase (%):</label>
+                                <input type="number" id="hoa-fee-increase" class="w-full p-3 border border-gray-300 rounded-md" placeholder="e.g., 2.5" step="0.01">
+                            </div>
+
+                            <div class="flex items-center">
+                                <input type="checkbox" id="other-costs-increase-check" class="mr-2">
+                                <label for="other-costs-increase-check" class="text-gray-700 font-bold">Other Costs Increase</label>
+                            </div>
+                            <div id="other-costs-increase-input" class="hidden">
+                                <label class="block text-gray-700 font-bold mb-2" for="other-costs-increase">Other Costs Increase (%):</label>
+                                <input type="number" id="other-costs-increase" class="w-full p-3 border border-gray-300 rounded-md" placeholder="e.g., 2" step="0.01">
+                            </div>
+                        </div>
+                    </details>
+
+                    <details class="mt-8">
+                        <summary class="text-2xl font-semibold text-gray-800 cursor-pointer">
+                            Extra Payment Simulator (Optional)
+                        </summary>
+                        <div class="mt-4 space-y-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="extra-monthly-payment-check" class="mr-2">
+                                <label for="extra-monthly-payment-check" class="text-gray-700 font-bold">Extra Monthly Payment</label>
+                            </div>
+                            <div id="extra-monthly-payment-input" class="hidden space-y-4">
+                                <div>
+                                    <label class="block text-gray-700 font-bold mb-2" for="extra-monthly-payment">Extra Monthly Payment ($):</label>
+                                    <input type="number" id="extra-monthly-payment" class="w-full p-3 border border-gray-300 rounded-md" placeholder="e.g., 100">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-bold mb-2" for="extra-monthly-start">Start Date:</label>
+                                    <input type="date" id="extra-monthly-start" class="w-full p-3 border border-gray-300 rounded-md">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-bold mb-2" for="extra-monthly-end">End Date:</label>
+                                    <input type="date" id="extra-monthly-end" class="w-full p-3 border border-gray-300 rounded-md">
+                                </div>
+                            </div>
+
+                            <div class="flex items-center">
+                                <input type="checkbox" id="extra-yearly-payment-check" class="mr-2">
+                                <label for="extra-yearly-payment-check" class="text-gray-700 font-bold">Extra Yearly Payment</label>
+                            </div>
+                            <div id="extra-yearly-payment-input" class="hidden space-y-4">
+                                <div>
+                                    <label class="block text-gray-700 font-bold mb-2" for="extra-yearly-payment">Extra Yearly Payment ($):</label>
+                                    <input type="number" id="extra-yearly-payment" class="w-full p-3 border border-gray-300 rounded-md" placeholder="e.g., 1000">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-bold mb-2" for="extra-yearly-start">Start Date:</label>
+                                    <input type="date" id="extra-yearly-start" class="w-full p-3 border border-gray-300 rounded-md">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-bold mb-2" for="extra-yearly-end">End Date:</label>
+                                    <input type="date" id="extra-yearly-end" class="w-full p-3 border border-gray-300 rounded-md">
+                                </div>
+                            </div>
+
+                            <div class="flex items-center">
+                                <input type="checkbox" id="extra-onetime-payment-check" class="mr-2">
+                                <label for="extra-onetime-payment-check" class="text-gray-700 font-bold">Extra One-time Payments</label>
+                            </div>
+                            <div id="extra-onetime-payment-input" class="hidden space-y-4">
+                                <div id="extra-onetime-payments-container">
+                                    <!-- One-time payments will be added here dynamically -->
+                                </div>
+                                <button type="button" id="add-onetime-payment" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors">+ Add New One-time Payment</button>
+                            </div>
+                        </div>
+                    </details>
+
+                    <div class="mt-6">
+                        <button type="button" onclick="calculateMortgage()" class="w-full bg-primary text-white px-6 py-3 rounded-md hover:bg-blue-600 transition-colors">Calculate Mortgage</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Graph Section -->
+            <section class="lg:w-1/2">
+                <h2 class="text-3xl font-semibold text-gray-800 mb-6">Mortgage Graph</h2>
+                <div class="bg-white p-4 rounded-lg shadow" style="height: 500px;">
+                    <div id="monthlyPayment" class="text-green-500 font-bold text-xl mb-2 text-center"></div>
+                    <canvas id="mortgageChart"></canvas>
+                </div>
+            </section>
+        </div>
+
+        <!-- Amortization Schedule Section -->
+        <section class="mt-12">
+            <h2 class="text-3xl font-semibold text-gray-800 mb-6">Amortization Schedule</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border">
+                    <thead>
+                        <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                            <th class="py-3 px-6 text-left">Year</th>
+                            <th class="py-3 px-6 text-left">Principal Payment</th>
+                            <th class="py-3 px-6 text-left">Interest Payment</th>
+                            <th class="py-3 px-6 text-left">Total Payment</th>
+                            <th class="py-3 px-6 text-left">Remaining Balance</th>
+                            <th class="py-3 px-6 text-left">Property Taxes</th>
+                            <th class="py-3 px-6 text-left">Home Insurance</th>
+                            <th class="py-3 px-6 text-left">PMI</th>
+                            <th class="py-3 px-6 text-left">HOA Fees</th>
+                            <th class="py-3 px-6 text-left">Other Costs</th>
+                            <th class="py-3 px-6 text-left">Total Annual Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody id="amortizationSchedule" class="text-gray-600 text-sm font-light">
+                        <!-- Amortization rows will be added here dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Add event listeners to checkboxes
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = [
+                'property-tax', 'home-insurance', 'pmi-insurance', 'hoa-fee', 'other-costs',
+                'property-tax-increase', 'home-insurance-increase', 'hoa-fee-increase', 'other-costs-increase',
+                'extra-monthly-payment', 'extra-yearly-payment', 'extra-onetime-payment'
+            ];
+            checkboxes.forEach(item => {
+                document.getElementById(`${item}-check`).addEventListener('change', function() {
+                    document.getElementById(`${item}-input`).style.display = this.checked ? 'block' : 'none';
+                });
+            });
+
+            // Add event listener for adding new one-time payments
+            document.getElementById('add-onetime-payment').addEventListener('click', addOneTimePayment);
+        });
+
+        let oneTimePaymentCounter = 0;
+
+        function addOneTimePayment() {
+            oneTimePaymentCounter++;
+            const container = document.getElementById('extra-onetime-payments-container');
+            const newPayment = document.createElement('div');
+            newPayment.className = 'mb-4 p-4 border border-gray-300 rounded-md';
+            newPayment.innerHTML = `
+                <div class="mb-2">
+                    <label class="block text-gray-700 font-bold mb-2" for="extra-onetime-payment-${oneTimePaymentCounter}">Extra One-time Payment ($):</label>
+                    <input type="number" id="extra-onetime-payment-${oneTimePaymentCounter}" class="w-full p-3 border border-gray-300 rounded-md" placeholder="e.g., 5000">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2" for="extra-onetime-date-${oneTimePaymentCounter}">Payment Date:</label>
+                    <input type="date" id="extra-onetime-date-${oneTimePaymentCounter}" class="w-full p-3 border border-gray-300 rounded-md">
+                </div>
+                <button type="button" class="mt-2 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors" onclick="removeOneTimePayment(this)">Remove</button>
+            `;
+            container.appendChild(newPayment);
+        }
+
+        function removeOneTimePayment(button) {
+            button.parentElement.remove();
+        }
+
+        function calculateMortgage() {
+            // Get input values
+            const homePrice = parseFloat(document.getElementById('home-price').value);
+            const downPaymentPercent = parseFloat(document.getElementById('down-payment').value);
+            const loanTerm = parseFloat(document.getElementById('loan-term').value);
+            const interestRate = parseFloat(document.getElementById('interest-rate').value);
+            const startDate = new Date(document.getElementById('start-date').value);
+            
+            // Annual Tax & Cost
+            const propertyTaxRate = document.getElementById('property-tax-check').checked ? parseFloat(document.getElementById('property-tax').value) / 100 : 0;
+            const homeInsurance = document.getElementById('home-insurance-check').checked ? parseFloat(document.getElementById('home-insurance').value) : 0;
+            const pmiInsurance = document.getElementById('pmi-insurance-check').checked ? parseFloat(document.getElementById('pmi-insurance').value) : 0;
+            const hoaFee = document.getElementById('hoa-fee-check').checked ? parseFloat(document.getElementById('hoa-fee').value) : 0;
+            const otherCosts = document.getElementById('other-costs-check').checked ? parseFloat(document.getElementById('other-costs').value) : 0;
+            
+            // Annual Increase Rates
+            const propertyTaxIncrease = document.getElementById('property-tax-increase-check').checked ? parseFloat(document.getElementById('property-tax-increase').value) / 100 : 0;
+            const homeInsuranceIncrease = document.getElementById('home-insurance-increase-check').checked ? parseFloat(document.getElementById('home-insurance-increase').value) / 100 : 0;
+            const hoaFeeIncrease = document.getElementById('hoa-fee-increase-check').checked ? parseFloat(document.getElementById('hoa-fee-increase').value) / 100 : 0;
+            const otherCostsIncrease = document.getElementById('other-costs-increase-check').checked ? parseFloat(document.getElementById('other-costs-increase').value) / 100 : 0;
+            
+            // Extra Payments
+            const extraMonthlyPayment = document.getElementById('extra-monthly-payment-check').checked ? parseFloat(document.getElementById('extra-monthly-payment').value) : 0;
+            const extraMonthlyStart = document.getElementById('extra-monthly-payment-check').checked ? new Date(document.getElementById('extra-monthly-start').value) : null;
+            const extraMonthlyEnd = document.getElementById('extra-monthly-payment-check').checked ? new Date(document.getElementById('extra-monthly-end').value) : null;
+            const extraYearlyPayment = document.getElementById('extra-yearly-payment-check').checked ? parseFloat(document.getElementById('extra-yearly-payment').value) : 0;
+            const extraYearlyStart = document.getElementById('extra-yearly-payment-check').checked ? new Date(document.getElementById('extra-yearly-start').value) : null;
+            const extraYearlyEnd = document.getElementById('extra-yearly-payment-check').checked ? new Date(document.getElementById('extra-yearly-end').value) : null;
+
+            // Get all one-time payments
+            const extraOneTimePayments = [];
+            if (document.getElementById('extra-onetime-payment-check').checked) {
+                const oneTimePayments = document.querySelectorAll('#extra-onetime-payments-container > div');
+                oneTimePayments.forEach(payment => {
+                    const amount = parseFloat(payment.querySelector('input[type="number"]').value);
+                    const date = new Date(payment.querySelector('input[type="date"]').value);
+                    if (!isNaN(amount) && !isNaN(date.getTime())) {
+                        extraOneTimePayments.push({ amount, date });
+                    }
+                });
+            }
+
+            const downPayment = (downPaymentPercent / 100) * homePrice;
+            const loanAmount = homePrice - downPayment;
+            const monthlyInterestRate = (interestRate / 100) / 12;
+            const totalMonths = loanTerm * 12;
+
+            const monthlyPayment = loanAmount * (monthlyInterestRate * Math.pow(1 + monthlyInterestRate, totalMonths)) /
+                (Math.pow(1 + monthlyInterestRate, totalMonths) - 1);
+
+            // Update the monthly payment display
+            const monthlyPaymentElement = document.getElementById('monthlyPayment');
+            monthlyPaymentElement.textContent = `Monthly Payment: $${monthlyPayment.toFixed(2)}`;
+            
+            let remainingBalance = loanAmount;
+            let yearlyData = [];
+            let currentDate = new Date(startDate);
+            let cumulativePayment = 0;
+            let cumulativeInterest = 0;
+            let yearlyPayment = 0;
+            let yearlyInterest = 0;
+            let yearlyPrincipal = 0;
+
+            for (let month = 1; month <= totalMonths; month++) {
+
+                if (remainingBalance <= 0) break;
+
+                let interestPayment = remainingBalance * monthlyInterestRate;
+                let principalPayment = monthlyPayment - interestPayment;
+                let extraPayment = 0;
+
+                // Check for extra monthly payment
+                if (extraMonthlyStart && extraMonthlyEnd && currentDate >= extraMonthlyStart && currentDate <= extraMonthlyEnd) {
+                    extraPayment += extraMonthlyPayment;
+                }
+
+                // Check for extra yearly payment
+                if (extraYearlyStart && extraYearlyEnd && currentDate.getMonth() === extraYearlyStart.getMonth() && currentDate >= extraYearlyStart && currentDate <= extraYearlyEnd) {
+                    extraPayment += extraYearlyPayment;
+                }
+
+                // Check for extra one-time payments
+                extraOneTimePayments.forEach(payment => {
+                    if (currentDate.getFullYear() === payment.date.getFullYear() &&
+                        currentDate.getMonth() === payment.date.getMonth()) {
+                        extraPayment += payment.amount;
+                    }
+                });
+
+                principalPayment += extraPayment;
+                
+                if (principalPayment > remainingBalance) {
+                    principalPayment = remainingBalance;
+                    interestPayment = remainingBalance * monthlyInterestRate;
+                }
+
+                remainingBalance -= principalPayment;
+                yearlyPrincipal +=principalPayment
+                yearlyPayment += principalPayment + interestPayment;
+                yearlyInterest += interestPayment;
+
+                cumulativePayment += principalPayment + interestPayment;
+                cumulativeInterest += interestPayment;
+
+                if (month % 12 === 0 || month === totalMonths || remainingBalance <= 0) {
+                    const year = Math.ceil(month / 12);
+                    const yearlyPropertyTax = homePrice * propertyTaxRate * Math.pow(1 + propertyTaxIncrease, year - 1);
+                    const yearlyHomeInsurance = homeInsurance * Math.pow(1 + homeInsuranceIncrease, year - 1);
+                    const yearlyPMI = remainingBalance / homePrice > 0.8 ? pmiInsurance : 0;
+                    const yearlyHOA = hoaFee * 12 * Math.pow(1 + hoaFeeIncrease, year - 1);
+                    const yearlyOtherCosts = otherCosts * 12 * Math.pow(1 + otherCostsIncrease, year - 1);
+                    const yearlyTotalCost = yearlyPayment + yearlyPropertyTax + yearlyHomeInsurance + yearlyPMI + yearlyHOA + yearlyOtherCosts;
+
+                    yearlyData.push({
+                        date: new Date(currentDate),
+                        year: year,
+                        yearlyPrincipal: yearlyPrincipal,
+                        yearlyPayment: yearlyPayment,
+                        yearlyInterest: yearlyInterest,
+                        cumulativePayment: cumulativePayment,
+                        cumulativeInterest: cumulativeInterest,
+                        remainingBalance: remainingBalance,
+                        propertyTax: yearlyPropertyTax,
+                        homeInsurance: yearlyHomeInsurance,
+                        pmi: yearlyPMI,
+                        hoaFees: yearlyHOA,
+                        otherCosts: yearlyOtherCosts,
+                        totalAnnualCost: yearlyTotalCost
+                    });
+                    yearlyPayment = 0;
+                    yearlyInterest = 0;
+                    yearlyPrincipal = 0;
+                }
+
+                currentDate.setMonth(currentDate.getMonth() + 1);
+            }
+
+            updateAmortizationSchedule(yearlyData);
+            updateChart(yearlyData);
+        }
+
+        function updateAmortizationSchedule(yearlyData) {
+            const amortizationTableBody = document.getElementById('amortizationSchedule');
+            amortizationTableBody.innerHTML = '';
+            yearlyData.forEach(data => {
+                const tableRow = `
+                    <tr class="border-b border-gray-200 hover:bg-gray-100">
+                        <td class="py-3 px-6 text-left whitespace-nowrap">${data.year}</td>
+                        <td class="py-3 px-6 text-left">$${(data.yearlyPrincipal).toFixed(2)}</td>
+                        <td class="py-3 px-6 text-left">$${(data.yearlyInterest).toFixed(2)}</td>
+                        <td class="py-3 px-6 text-left">$${data.yearlyPayment.toFixed(2)}</td>
+                        <td class="py-3 px-6 text-left">$${data.remainingBalance.toFixed(2)}</td>
+                        <td class="py-3 px-6 text-left">$${data.propertyTax.toFixed(2)}</td>
+                        <td class="py-3 px-6 text-left">$${data.homeInsurance.toFixed(2)}</td>
+                        <td class="py-3 px-6 text-left">$${data.pmi.toFixed(2)}</td>
+                        <td class="py-3 px-6 text-left">$${data.hoaFees.toFixed(2)}</td>
+                        <td class="py-3 px-6 text-left">$${data.otherCosts.toFixed(2)}</td>
+                        <td class="py-3 px-6 text-left">$${data.totalAnnualCost.toFixed(2)}</td>
+                    </tr>`;
+                amortizationTableBody.innerHTML += tableRow;
+            });
+        }
+
+        function updateChart(yearlyData) {
+            const ctx = document.getElementById('mortgageChart').getContext('2d');
+            
+            if (window.mortgageChart instanceof Chart) {
+                window.mortgageChart.destroy();
+            }
+
+            window.mortgageChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'Cumulative Payment',
+                        data: yearlyData.map(data => ({ x: data.date, y: data.cumulativePayment })),
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        fill: false,
+                    }, {
+                        label: 'Remaining Balance',
+                        data: yearlyData.map(data => ({ x: data.date, y: data.remainingBalance })),
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        fill: false,
+                    }, {
+                        label: 'Cumulative Interest',
+                        data: yearlyData.map(data => ({ x: data.date, y: data.cumulativeInterest })),
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        fill: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'year'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Year'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Amount ($)'
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    const date = new Date(context[0].parsed.x);
+                                    return `${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
