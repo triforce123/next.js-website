@@ -5,7 +5,7 @@ import { RiLinkedinBoxFill, RiTwitterFill, RiGithubFill } from 'react-icons/ri';
 export default function PersonalWebsite() {
   const calculators = [
     { name: "Home Loan Simulator", url: "home-loan-calculator.html", icon: <RiMoneyDollarBoxLine className="text-2xl text-primary mr-3" /> },
-    { name: "Auto Loan Simulator", url: "auto-loan", icon: <RiMoneyDollarBoxLine className="text-2xl text-primary mr-3" /> },
+    // { name: "Auto Loan Simulator", url: "auto-loan", icon: <RiMoneyDollarBoxLine className="text-2xl text-primary mr-3" /> },
   ];
 
   const politicalCartoons = [
@@ -36,6 +36,7 @@ export default function PersonalWebsite() {
     { name: "Twitter", url: "https://twitter.com/lesliegarcia", icon: <RiTwitterFill className="w-6 h-6 text-gray-800 hover:text-blue-500 transition duration-200" /> },
     { name: "GitHub", url: "https://github.com/lesliegarcia", icon: <RiGithubFill className="w-6 h-6 text-gray-800 hover:text-blue-500 transition duration-200" /> },
   ];
+
 
   return (
     <div className="bg-gray-100">
