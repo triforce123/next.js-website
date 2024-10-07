@@ -61,7 +61,7 @@ export default function PersonalWebsite() {
               href={calc.url}
               className="flex items-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
             >
-              {calc.icon}
+              <div className='text-gray-800'>{calc.icon}</div>
               <h3 className="text-xl font-medium text-gray-800">{calc.name}</h3>
             </a>
           ))}
